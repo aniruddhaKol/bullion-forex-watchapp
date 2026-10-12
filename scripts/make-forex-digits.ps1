@@ -1,5 +1,6 @@
+$projectRoot = Split-Path -Parent $PSScriptRoot
 Add-Type -AssemblyName System.Drawing
-$output="$PSScriptRoot/assets/432x514-amazfit-bip-max"
+$output="$projectRoot/assets/432x514-amazfit-bip-max"
 $scale=4
 $family=New-Object System.Drawing.FontFamily 'Arial'
 $colors=@{white=[System.Drawing.Color]::White;gold=[System.Drawing.Color]::FromArgb(255,255,223,79);amber=[System.Drawing.Color]::FromArgb(255,176,138,48)}

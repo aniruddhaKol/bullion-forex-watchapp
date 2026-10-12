@@ -1,6 +1,5 @@
 # Bullion Forex v1.0.16
 
-Author: **Aniruddha DuttaChowdhury**. Developer brand: **ADChowdhury**.
 Project package identifier: `app.adc.bullionforex`.
 Zepp registered application ID: **1130321** (unchanged).
 

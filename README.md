@@ -1,21 +1,33 @@
 # Bullion Forex
 
-Author: **Aniruddha DuttaChowdhury**. Developer brand: **ADChowdhury**.
+Zepp OS app for Amazfit Bip Max (432 × 514). Version 1.0.16.
 
-Zepp OS project for Amazfit Bip Max (432 × 514). Current source version: **1.0.16**. Registered Zepp application ID: **1130321**.
+![Preview](previews/watchface-preview.png)
 
-![Preview](watchface-preview.png)
+## Project layout
+
+- `assets/`: generated assets used by the watch.
+- `pages/`, `app-side/`, `shared/`: watch UI, phone-side service and shared logic.
+- `artwork/`: source images and design references.
+- `previews/`: rendered previews and visual checks.
+- `scripts/`: asset generation, preview and build helpers.
+- `references/`: display contour and revision baselines.
+- `releases/`: original versioned Zepp packages.
 
 ## Build
 
-Install the official Zepp Zeus CLI and a supported Node.js runtime. Run `zeus build -t "Amazfit Bip Max"` from this directory. Asset generation uses Windows PowerShell and System.Drawing. Existing generated assets are included. Local build wrappers refer to machine-local tools; use the installed Zeus CLI on other machines.
+Install Node.js and the official Zepp Zeus CLI, then run from the repository root:
 
-## Identity and releases
+```sh
+zeus build -t "Amazfit Bip Max"
+```
 
-The textual project identifier is `app.adc.bullionforex`. Zepp uses the numeric registered ID above; preserve it for in-place upgrades. Historical release packages are preserved unchanged, including their original metadata. Source metadata uses the confirmed author name. No new store submission is performed by publishing this repository.
+Asset generation uses Windows PowerShell and System.Drawing. Generated assets are already included. To regenerate them, run `./scripts/make-assets.ps1`. Run preview and validation commands from the repository root. Local Zeus wrappers require a configured local tool installation; the standard CLI command above works with an installed Zeus CLI.
 
-See [source notices](SOURCE-NOTICES.md) and [Zepp sample licence](LICENSE-zeppos-samples.txt) for data-provider attribution and bundled third-party code.
+## Data sources
 
-## Publication hygiene
+See [source notices](docs/SOURCE-NOTICES.md) for provider details and attribution. The bundled bridge code retains its [third-party licence](LICENSE-zeppos-samples.txt).
 
-Browser profiles, credentials, developer-console screenshots, tool installations and temporary installation QR links are excluded. No project-wide open-source licence has been selected; public visibility alone does not grant a licence to reuse the original code or artwork. Third-party licences remain applicable to their respective components.
+## Releases
+
+Published packages are available on the repository’s Releases page. Existing packages remain unchanged. GitHub publication is separate from Zepp store approval and installation. Preserve the registered numeric Zepp ID in `app.json` for in-place upgrades.

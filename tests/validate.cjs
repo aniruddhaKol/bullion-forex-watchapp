@@ -23,15 +23,15 @@ assert.equal(JSON.parse(fs.readFileSync('package.json')).name,'app.adc.bullionfo
  for(const key of ['gold','silver','platinum'])assert(s.page.labels[key+'Currency'].x>=4+238*(screen.width-8)/432-1)
  if(fs.existsSync('live-feed-ibja-check.json'))s.page.rates=JSON.parse(fs.readFileSync('live-feed-ibja-check.json'));else s.page.rates=r
  s.page.draw();s.page.status('READY')
- fs.writeFileSync('preview-layout.json',JSON.stringify(s.widgets,null,2))
- s.page.showUpdates();fs.writeFileSync('date-feedback-preview-layout.json',JSON.stringify(s.widgets,null,2))
+ fs.writeFileSync('previews/preview-layout.json',JSON.stringify(s.widgets,null,2))
+ s.page.showUpdates();fs.writeFileSync('previews/date-feedback-preview-layout.json',JSON.stringify(s.widgets,null,2))
  let about,aboutWidgets=[]
  vm.runInNewContext(source('pages/about.js'),{getDeviceInfo:()=>screen,setStatusBarVisible(){},widget:{TEXT:'TEXT'},align:{CENTER_H:1,CENTER_V:2},text_style:{WRAP:1},createWidget:(kind,p)=>aboutWidgets.push({kind,...p}),Page:p=>{about=p}})
  about.build()
  const aboutText=aboutWidgets.map(w=>w.text).join('\n')
  assert(aboutText.includes('IBJA via TrackLivePrice')&&aboutText.includes('trackliveprice.com/methodology/')&&aboutText.includes('Aniruddha DuttaChowdhury'))
  for(const item of aboutWidgets){assert(item.x+item.w<=screen.width);assert(item.y+item.h<=screen.height)}
- fs.writeFileSync('about-preview-layout.json',JSON.stringify(aboutWidgets,null,2))
+ fs.writeFileSync('previews/about-preview-layout.json',JSON.stringify(aboutWidgets,null,2))
  s.page.onDestroy();assert(!s.page.alive)
  for(const item of s.widgets.filter(w=>w.kind==='IMG'))assert(fs.existsSync('assets/432x514-amazfit-bip-max/'+item.src))
  console.log('PASS Indian units, runtime layout, estimate/IBJA labels, author/identity, attribution route, refresh/cleanup')

@@ -1,15 +1,16 @@
-param([string]$LayoutPath='preview-layout.json',[switch]$About,[string]$Output='Rendered-Preview-v1.0.14.png')
+param([string]$LayoutPath='previews/preview-layout.json',[switch]$About,[string]$Output='previews/Rendered-Preview-v1.0.14.png')
+$projectRoot = Split-Path -Parent $PSScriptRoot
 Add-Type -AssemblyName System.Drawing
 $bmp = New-Object System.Drawing.Bitmap 432,514
 $g = [System.Drawing.Graphics]::FromImage($bmp)
 $g.Clear([System.Drawing.Color]::Black)
-$source = [System.Drawing.Image]::FromFile("$PSScriptRoot/assets/432x514-amazfit-bip-max/background.png")
+$source = [System.Drawing.Image]::FromFile("$projectRoot/assets/432x514-amazfit-bip-max/background.png")
 if(!$About){$g.DrawImage($source,4,4,424,506)}
 $g.TextRenderingHint = 'AntiAliasGridFit'
-$layout = Get-Content "$PSScriptRoot/$LayoutPath" -Raw -Encoding UTF8 | ConvertFrom-Json
+$layout = Get-Content "$projectRoot/$LayoutPath" -Raw -Encoding UTF8 | ConvertFrom-Json
 foreach($item in $layout) {
   if($item.kind -eq 'IMG' -and $item.src -like 'fx-*.png'){
-    $digit=[System.Drawing.Image]::FromFile("$PSScriptRoot/assets/432x514-amazfit-bip-max/$($item.src)")
+    $digit=[System.Drawing.Image]::FromFile("$projectRoot/assets/432x514-amazfit-bip-max/$($item.src)")
     $g.DrawImage($digit,[int]$item.x,[int]$item.y,[int]$item.w,[int]$item.h)
     $digit.Dispose()
   }
@@ -25,7 +26,7 @@ foreach($item in $layout) {
   $g.DrawString([string]$item.text,$font,$brush,$rect,$format)
   $brush.Dispose();$font.Dispose();$format.Dispose()
 }
-$contour=Get-Content "$PSScriptRoot/display-contour.json" -Raw | ConvertFrom-Json
+$contour=Get-Content "$projectRoot/references/display-contour.json" -Raw | ConvertFrom-Json
 for($y=0;$y -lt 514;$y++){
   $row=$contour[$y]
   if(!$row){$row=$contour[$y]}
@@ -34,7 +35,8 @@ for($y=0;$y -lt 514;$y++){
     $g.FillRectangle([System.Drawing.Brushes]::Black,([int]$row[1]+1),$y,(431-[int]$row[1]),1)
   }
 }
-$bmp.Save("$PSScriptRoot/$Output",[System.Drawing.Imaging.ImageFormat]::Png)
+$outputPath = if ([System.IO.Path]::IsPathRooted($Output)) { $Output } elseif ($Output -like 'previews/*') { Join-Path $projectRoot $Output } else { Join-Path (Join-Path $projectRoot 'previews') $Output }
+$bmp.Save($outputPath,[System.Drawing.Imaging.ImageFormat]::Png)
 $g.Dispose();$bmp.Dispose()
 
 
