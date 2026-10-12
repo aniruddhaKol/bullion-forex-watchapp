@@ -1,0 +1,58 @@
+{
+  "configVersion": "v3",
+  "app": {
+    "appId": 1130321,
+    "appName": "Bullion Forex",
+    "appType": "app",
+    "version": {
+      "code": 17,
+      "name": "1.0.16"
+    },
+    "icon": "icon.png",
+    "vender": "Aniruddha DuttaChowdhury",
+    "description": "ADChowdhury: IBJA Indian gold/silver, platinum spot estimate and daily forex",
+    "_pikeCompatibled": 1
+  },
+  "runtime": {
+    "apiVersion": {
+      "minVersion": "3.0.0",
+      "target": "3.0.0",
+      "compatible": "3.0.0"
+    }
+  },
+  "permissions": [
+    "data:os.device.info",
+    "device:os.local_storage"
+  ],
+  "targets": {
+    "432x514-amazfit-bip-max": {
+      "module": {
+        "page": {
+          "pages": [
+            "pages/index",
+            "pages/about"
+          ]
+        },
+        "app-side": {
+          "path": "app-side/index"
+        }
+      },
+      "platforms": [
+        {
+          "name": "Amazfit Bip Max",
+          "deviceSource": 11206915,
+          "st": "s",
+          "sr": "w432",
+          "dw": 432
+        }
+      ],
+      "designWidth": 432
+    }
+  },
+  "i18n": {
+    "en-US": {
+      "appName": "Bullion Forex"
+    }
+  },
+  "defaultLanguage": "en-US"
+}

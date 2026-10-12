@@ -1,0 +1,50 @@
+const assert=require('assert')
+const {logic,scene,tick}=require('./watch-scene.cjs')
+const now=Date.parse('2026-10-09T12:00:00Z'),hour=3600000,date='2026-10-09'
+const payload=(metal,rows)=>({source:'IBJA',metal,purity:'999',unit:'INR per gram',rows})
+const fixture=(metal)=>payload(metal,[{date,am:100,pm:110,close:100}])
+const r={...logic.convertIndianMetal(fixture('gold'),'gold',now),...logic.convertIndianMetal(fixture('silver'),'silver',now),
+ platinum:51000,platinumAt:date+'T09:00:00Z',platinumSource:'International spot estimate',usd:96,eur:108,gbp:127,fxDate:date}
+const cache=(age=0)=>({...r,goldFetchedAt:now-age,silverFetchedAt:now-age,platinumFetchedAt:now,forexFetchedAt:now})
+const stored=rates=>({[logic.CACHE_KEY]:JSON.stringify(rates)})
+assert.equal(logic.indianQuote(fixture('gold'),'gold',now).session,'PM')
+assert.equal(r.gold,1100);assert.equal(r.silver,11000)
+const am=payload('gold',[{date:'2026-10-08',am:80,pm:90},{date,am:100,pm:null,close:999}])
+assert.equal(logic.indianQuote(am,'gold',now).price,100,'Newest AM beats older PM and close')
+assert.equal(logic.indianQuote(payload('gold',[{date,am:100},{date,pm:110}]),'gold',now).price,110,'Prefer PM across duplicate rows')
+assert.equal(logic.indianQuote(payload('gold',[{date:'2026-10-10',pm:999},{date:'2026-02-30',pm:999},{date,pm:110}]),'gold',now).price,110)
+for(const change of [{source:'other'},{metal:'silver'},{purity:'995'},{unit:'INR per kg'},{rows:[{date,close:100}]},{rows:[{date:'2026-10-10',am:100}]},{rows:[{date,am:0,pm:-1}]},{rows:[{date,pm:'110'}]}])assert.throws(()=>logic.indianQuote({...fixture('gold'),...change},'gold',now))
+assert(logic.freshGroup(cache(hour-1),'gold',now));assert(!logic.freshGroup(cache(hour),'gold',now),'One-hour boundary, even same date')
+assert(!logic.freshGroup({...cache(),goldFetchedAt:now+1},'gold',now))
+assert(!logic.validGroup({...r,goldSource:'International spot'},'gold',now))
+assert(!logic.indianDate('2026-02-30',now));assert(!logic.indianDate('2026-10-10',now))
+;(async()=>{
+ const fresh=scene(stored(cache(hour-1)),now);assert.equal(fresh.requests,0);fresh.page.refresh();assert.equal(fresh.requests,0);fresh.page.onDestroy()
+ const expired=scene(stored(cache(hour)),now);assert(expired.requestArgs.gold&&expired.requestArgs.silver);assert(!expired.requestArgs.forex&&!expired.requestArgs.platinum)
+ expired.pending.resolve({gold:{...r,gold:1200,goldSession:'PM'},silverError:true});await tick()
+ const saved=JSON.parse(expired.stored[logic.CACHE_KEY]);assert.equal(saved.gold,1200);assert.equal(saved.goldFetchedAt,now);assert.equal(saved.silverFetchedAt,now-hour);assert.equal(saved.silver,11000)
+ expired.page.onDestroy()
+ const legacy={gold:128000,silver:18000,platinum:51000,usd:96,eur:108,gbp:127,fxDate:date,bullionFetchedAt:now,forexFetchedAt:now}
+ const migrated=scene({'rates-100g-v2':JSON.stringify(legacy)},now)
+ assert.equal(migrated.page.labels.gold.text,'--');assert.equal(migrated.page.labels.silver.text,'--');assert.equal(migrated.page.labels.platinum.text,'51,000')
+ assert(migrated.requestArgs.gold&&migrated.requestArgs.silver);assert(!migrated.requestArgs.platinum&&!migrated.requestArgs.forex)
+ migrated.pending.reject(new Error('offline'));await tick();assert.equal(migrated.page.labels.gold.text,'--','Never show legacy spot as IBJA');migrated.page.onDestroy()
+ const offline=scene(stored(cache(hour)),now),old=offline.stored[logic.CACHE_KEY];offline.pending.reject(new Error('offline'));await tick()
+ assert.equal(offline.stored[logic.CACHE_KEY],old);assert.equal(offline.page.labels.gold.text,'1,100');offline.page.onDestroy()
+ const peek=scene(stored(cache()),now),normal=peek.page.labels.date.text
+ peek.page.showUpdates();assert.equal(peek.page.labels.date.text,'AU: 09 OCT PM');peek.page.clock();assert.equal(peek.page.labels.date.text,'AU: 09 OCT PM')
+ assert.equal(peek.page.labels.date.color,0xffffff);assert.equal(peek.haptics.filter(x=>x===1).length,1,'One haptic acknowledgment per tap')
+ peek.timers.find(t=>t.delay===180).fn();assert.equal(peek.haptics.at(-1),'stop')
+ for(const [at,next] of [[3000,'AG: 09 OCT PM'],[6000,'PT: 09 OCT EST'],[9000,'FX: 09 OCT'],[12000,normal]]){
+  peek.timers.find(t=>t.delay===at-250).fn();peek.page.clock();peek.page.status('CACHED')
+  assert.equal(peek.page.labels.date.text,'','Clock/status cannot fill the transition blank');assert.equal(peek.page.labels.date.color,0xffffff)
+  peek.timers.find(t=>t.delay===at).fn();assert.equal(peek.page.labels.date.text,next)
+ }
+ assert.equal(peek.page.labels.date.color,0xffff83);assert.equal(peek.requests,0)
+ peek.page.showUpdates();const previous=[...peek.page.peekTimers,peek.page.restoreTimer,peek.page.hapticTimer]
+ peek.page.showUpdates();previous.forEach(id=>assert(peek.cleared.includes(id),'Repeated taps cancel old feedback timers'))
+ assert.equal(peek.haptics.filter(x=>x===1).length,3)
+ peek.page.onDestroy();assert(peek.cleared.length>=4)
+ const reopened=scene(expired.stored,now);assert(!reopened.requestArgs.gold&&reopened.requestArgs.silver,'Persist independent hour expiry');reopened.page.onDestroy()
+ console.log('PASS AM/PM/close rules, metadata/calendar/future validation, 1h boundary, legacy invalidation, independent cache/failure, quote/session peek')
+})().catch(error=>{console.error(error);process.exitCode=1})
