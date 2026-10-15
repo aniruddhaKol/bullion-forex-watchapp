@@ -31,3 +31,30 @@ See [source notices](docs/SOURCE-NOTICES.md) for provider details and attributio
 ## Releases
 
 Published packages are available on the repository’s Releases page. Existing packages remain unchanged. GitHub publication is separate from Zepp store approval and installation. Preserve the registered numeric Zepp ID in `app.json` for in-place upgrades.
+
+
+## License
+
+Copyright © 2026 Aniruddha DuttaChowdhury.
+
+Original project material is licensed under the **PolyForm Noncommercial License 1.0.0**. Personal, academic, research, educational and other qualifying noncommercial uses, modifications and redistribution are permitted in accordance with its terms. Commercial uses outside those permissions require separate authorization from the copyright holder.
+
+Anyone redistributing covered software, including within another application, must pass along the license terms or their URL and all applicable Required Notices identifying the original author, project and source repository. This license does not require publication of the modified application's source code.
+
+For complete terms, see [LICENSE.md](LICENSE.md). Third-party software, libraries, fonts, data and artwork remain subject to their respective licenses; see [third-party notices and unresolved permissions](THIRD-PARTY-NOTICES.md).
+
+### Redistribution attribution example
+
+For an application derived from `bullion-forex-watchapp`, accompany the distributed software with the license terms or their URL and these notices, for example in licensing documents or an attribution file:
+
+```text
+Based on: bullion-forex-watchapp
+Required Notice: Copyright © 2026 Aniruddha DuttaChowdhury.
+Required Notice: Original Author: Aniruddha DuttaChowdhury.
+Required Notice: Original Project: bullion-forex-watchapp.
+Required Notice: Original Source: https://github.com/aniruddhaKol/bullion-forex-watchapp
+License: PolyForm Noncommercial License 1.0.0
+License terms: https://polyformproject.org/licenses/noncommercial/1.0.0
+```
+
+An About screen acknowledgment is encouraged. The standard license does not impose separate app-store attribution or UI-branding requirements, or require public disclosure of modified source code.
